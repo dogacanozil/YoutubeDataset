@@ -14,7 +14,7 @@ def create_channel_record_as_list_by_channel_id(channel_id:str):
     try:
         channel_name = channel_object.channel_name
     except:
-        return [channel_id, "This channel does not exist.", "This channel does not exist.", "This channel does not exist.", "This channel does not exist.", "This channel does not exist.", "This channel does not exist."]
+        return [channel_id, "", "", "", "", "", "", "" , "", current_time, False]
     
     channel_about_html = str(channel_object.about_html)
     channels_links_as_string = find_between(channel_about_html, ',"links":', ',"displayCanonicalChannelUrl":')
@@ -27,18 +27,22 @@ def create_channel_record_as_list_by_channel_id(channel_id:str):
     for channel in channels_links_as_list:
         channels_links_per_channel.append(f"{channel['channelExternalLinkViewModel']['title']['content']}: {channel['channelExternalLinkViewModel']['link']['content']}")
 
-    channel_subscriber = find_between(channel_about_html, '"subscriberCountText":"', ' subscribers')
+    channel_subscriber_count = find_between(channel_about_html, '"subscriberCountText":"', ' subscribers')
+    channel_video_count = int(find_between(channel_about_html, ',"videoCountText":"', ' videos",').replace(',' , ''))
+    channel_view_count = int(find_between(channel_about_html, ',"viewCountText":"', ' views",').replace(',' , ''))
     channel_description = find_between(channel_about_html, 'name="description" content="', '"><meta name="keywords"')
+    channel_creation_date = datetime.strptime(find_between(channel_about_html, '"content":"Joined ', '","styleRuns"').replace(',' , ''), "%b %d %Y")
+    channel_country = find_between(channel_about_html, '"country":"', '","')
+    is_active = True
 
+    return [channel_id, channel_name, channel_description, channels_links_per_channel, channel_video_count, channel_view_count, channel_subscriber_count, channel_country , channel_creation_date, current_time, is_active]
 
-    return [channel_id, f"https://www.youtube.com/channel/{channel_id}", channel_name, channel_description, channels_links_per_channel, channel_subscriber, current_time]
-
-
+ 
 def create_channel_records_list_list(channel_ids:list):
     return [create_channel_record_as_list_by_channel_id(channel_id) for channel_id in tqdm(channel_ids)]
 
 
-def channels_fetch_and_write_to_csv(channel_ids:list, output_address:str, output_file_name:str = None, write_size:int = 1000, col_names:list = ['channel_id', 'channel_url', 'channel_name', 'channel_description', 'channel_links', 'channel_subscriber_count', 'date_of_capture']):
+def channels_fetch_and_write_to_csv(channel_ids:list, output_address:str, output_file_name:str = None, write_size:int = 1000, col_names:list = ['channel_id', 'channel_name', 'channel_description', 'channel_links', 'channel_video_count', 'channel_view_count', 'channel_subscriber_count', 'channel_country',  'channel_creation_date', 'date_of_capture', 'is_active']):
     size = len(channel_ids)
     if output_file_name is None: output_file_name = f"{size}_channels_list.csv"
 
@@ -60,7 +64,7 @@ def channels_fetch_and_write_to_csv(channel_ids:list, output_address:str, output
         writer.writerows(create_channel_records_list_list(channel_ids[(i*write_size):size]))
 
 
-def channels_fetch_and_write_to_csv_gzipped(channel_ids:list, output_address:str, output_file_name:str = None, write_size:int = 1000, col_names:list = ['channel_id', 'channel_url', 'channel_name', 'channel_description', 'channel_links', 'channel_subscriber_count', 'date_of_capture']):
+def channels_fetch_and_write_to_csv_gzipped(channel_ids:list, output_address:str, output_file_name:str = None, write_size:int = 1000, col_names:list = ['channel_id', 'channel_name', 'channel_description', 'channel_links', 'channel_video_count', 'channel_view_count', 'channel_subscriber_count', 'channel_country',  'channel_creation_date', 'date_of_capture', 'is_active']):
     size = len(channel_ids)
     if output_file_name is None: output_file_name = f"{size}_channels_list.csv.gz"
 
@@ -82,7 +86,7 @@ def channels_fetch_and_write_to_csv_gzipped(channel_ids:list, output_address:str
         writer.writerows(create_channel_records_list_list(channel_ids[(i*write_size):size]))
 
 
-def channels_fetch_and_write_to_csv_gzipped_continue_from_index(channel_ids:list, output_address:str, index, output_file_name:str = None, write_size:int = 1000, col_names:list = ['channel_id', 'channel_url', 'channel_name', 'channel_description', 'channel_links', 'channel_subscriber_count', 'date_of_capture']):
+def channels_fetch_and_write_to_csv_gzipped_continue_from_index(channel_ids:list, output_address:str, index, output_file_name:str = None, write_size:int = 1000, col_names:list = ['channel_id', 'channel_name', 'channel_description', 'channel_links', 'channel_video_count', 'channel_view_count', 'channel_subscriber_count', 'channel_country',  'channel_creation_date', 'date_of_capture', 'is_active']):
     
     size = len(channel_ids)
     if output_file_name is None: output_file_name = f"{size}_channels_list.csv.gz"
