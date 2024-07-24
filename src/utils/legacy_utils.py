@@ -53,3 +53,42 @@ def create_channel_record_as_json_by_channel_id(channel_id:str):
 
 def create_channel_records_list_json(channel_ids:list):
     return [create_channel_record_as_json_by_channel_id(channel_id) for channel_id in tqdm(channel_ids)]
+
+
+# def channels_fetch_and_write_to_csv_gzipped_continue_from_index(channel_ids:list, output_address:str, index, output_file_name:str = None, write_size:int = 1000, col_names:list = ['channel_id', 'channel_name', 'channel_description', 'channel_links', 'channel_video_count', 'channel_view_count', 'channel_subscriber_count', 'channel_country',  'channel_creation_date', 'date_of_capture', 'is_active']):
+    
+#     size = len(channel_ids)
+#     if output_file_name is None: output_file_name = f"{size}_channels_list.csv.gz"
+
+#     csv_file_path=output_address+output_file_name
+
+#     with gzip.open(csv_file_path, mode='at', newline='', encoding='utf-8') as file:
+#         writer = csv.writer(file)
+
+#         i=0
+#         while index+((i+1) * write_size) < size:
+#             writer.writerows(create_channel_records_list_list(channel_ids[(index+i*write_size):(index+(i+1)*write_size)]))
+#             i=i+1
+#             print(index+(i) * write_size)
+        
+#         writer.writerows(create_channel_records_list_list(channel_ids[index+(i*write_size):size]))
+
+
+
+# def channels_fetch_and_write_to_csv_gzipped_continue_from_index(channel_ids:list, output_address:str, index, output_file_name:str = None, write_size:int = 1000, col_names:list = ['channel_id', 'channel_name', 'channel_description', 'channel_links', 'channel_video_count', 'channel_view_count', 'channel_subscriber_count', 'channel_country',  'channel_creation_date', 'date_of_capture', 'is_active']):
+    
+#     size = len(channel_ids)
+#     if output_file_name is None: output_file_name = f"{size}_channels_list.csv.gz"
+
+#     csv_file_path=output_address+output_file_name
+
+#     with gzip.open(csv_file_path, mode='at', newline='', encoding='utf-8') as file:
+#         writer = csv.writer(file)
+
+#         i=0
+#         while index+((i+1) * write_size) < size:
+#             writer.writerows(create_channel_records_list_list(channel_ids[(index+i*write_size):(index+(i+1)*write_size)]))
+#             i=i+1
+#             print(index+(i) * write_size)
+        
+#         writer.writerows(create_channel_records_list_list(channel_ids[index+(i*write_size):size]))

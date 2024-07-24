@@ -28,6 +28,17 @@ def create_channel_video_relationship_list_limited_videos(channel_ids_df:pd.Data
             for video in scrapetube.get_channel(row.channel_id, limit=threshold):
                 video_count=video_count+1
             if video_count == threshold:
+                videos = scrapetube.get_channel(row.channel_id, limit=threshold//3, sort_by='popular')
+                for video in videos:
+                    current_time = datetime.now()
+                    if video['videoId'] not in channel_set:
+                        video_object = YouTube(f"https://www.youtube.com/watch?v={video['videoId']}")
+                        if "descriptionSnippet" in video:
+                            video_description = video["descriptionSnippet"]["runs"][0]["text"].replace("\n", "")
+                        else:
+                            video_description = ""
+                        channel_video_list.append([row.channel_id, video['videoId'], video_object.title, video_object.length, video_description, video_object.thumbnail_url, video_object.views, video_object.publish_date, current_time])
+                        channel_set.add(video['videoId'])
                 videos = scrapetube.get_channel(row.channel_id, limit=threshold//3, sort_by='newest')
                 for video in videos:
                     current_time = datetime.now()
@@ -40,17 +51,6 @@ def create_channel_video_relationship_list_limited_videos(channel_ids_df:pd.Data
                         channel_video_list.append([row.channel_id, video['videoId'], video_object.title, video_object.length, video_description, video_object.thumbnail_url, video_object.views, video_object.publish_date, current_time])
                         channel_set.add(video['videoId'])
                 videos = scrapetube.get_channel(row.channel_id, limit=threshold//3, sort_by='oldest')
-                for video in videos:
-                    current_time = datetime.now()
-                    if video['videoId'] not in channel_set:
-                        video_object = YouTube(f"https://www.youtube.com/watch?v={video['videoId']}")
-                        if "descriptionSnippet" in video:
-                            video_description = video["descriptionSnippet"]["runs"][0]["text"].replace("\n", "")
-                        else:
-                            video_description = ""
-                        channel_video_list.append([row.channel_id, video['videoId'], video_object.title, video_object.length, video_description, video_object.thumbnail_url, video_object.views, video_object.publish_date, current_time])
-                        channel_set.add(video['videoId'])
-                videos = scrapetube.get_channel(row.channel_id, limit=threshold//3, sort_by='popular')
                 for video in videos:
                     current_time = datetime.now()
                     if video['videoId'] not in channel_set:
