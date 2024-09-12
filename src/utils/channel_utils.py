@@ -6,10 +6,11 @@ from datetime import datetime
 import csv
 from tqdm import tqdm
 import requests
-import time
+import urllib.request
+import urllib.error
 
 
-def create_channel_record_as_list_by_channel_id(channel_id:str):
+def create_channel_record_as_list_by_channel_id(channel_id:str, counter:int = 0):
     current_time = datetime.now()
     channel_object = Channel(f"https://www.youtube.com/channel/{channel_id}")
     
@@ -18,9 +19,12 @@ def create_channel_record_as_list_by_channel_id(channel_id:str):
     except requests.exceptions.RequestException as e:
         if e.response.status_code == 429:
             print("Error: Too Many Requests (HTTP 429). Please wait and try again later.")
-        else:
-            print(f"HTTP error occurred: {e}")
+        elif e.response.status_code == 404:
+            print(f"HTTP error occurred: {e} and respone: {e.response}, this channel: {channel_id}")
         raise
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return [channel_id, "", "", "", "", "", "", "" , "", current_time, False]
     except KeyError as e:
         return [channel_id, "", "", "", "", "", "", "" , "", current_time, False]
     
@@ -40,12 +44,27 @@ def create_channel_record_as_list_by_channel_id(channel_id:str):
         channel_video_count = int(find_between(channel_about_html, ',"videoCountText":"', ' videos",').replace(',' , ''))
     else:
         channel_video_count = 0
+    
     if find_between(channel_about_html, ',"viewCountText":"', ' views",').replace(',' , '') != "": 
         channel_view_count = int(find_between(channel_about_html, ',"viewCountText":"', ' views",').replace(',' , ''))
     else:
         channel_view_count = 0
     channel_description = find_between(channel_about_html, 'name="description" content="', '"><meta name="keywords"')
-    channel_creation_date = datetime.strptime(find_between(channel_about_html, '"content":"Joined ', '","styleRuns"').replace(',' , ''), "%b %d %Y")
+    
+    try:
+        channel_creation_date = datetime.strptime(find_between(channel_about_html, 'joinedDateText":{"content":"Joined ', '","styleRuns"').replace(',' , ''), "%b %d %Y")
+    except ValueError as ve:
+        if channel_id == 'UCBR8-60-B28hp2BmDPdntcQ':
+            channel_creation_date = None
+        elif counter<10:
+            print(f"ValueError error occurred: {ve}, channel id: {channel_id} , channel name: {channel_name}, channel_video_count: {channel_video_count}")
+            print(f"Retry for the {counter} time")
+            return create_channel_record_as_list_by_channel_id(channel_id, counter+1)
+        else:
+            print(f"Raise error after 10 trial")
+            print(f"ValueError error occurred: {ve}, channel id: {channel_id} , channel name: {channel_name}, channel_video_count: {channel_video_count}")
+            raise
+
     channel_country = find_between(channel_about_html, '"country":"', '","')
     is_active = True
 
@@ -65,7 +84,8 @@ def channels_fetch_and_write_to_csv_gzipped(channel_ids:list, output_address:str
     channel_ids = channel_ids[from_index:until_index]
 
     size = len(channel_ids)
-    if output_file_name is None: output_file_name = f"from_{from_index}_until_{until_index}_channels_list.csv.gz"
+    if output_file_name is None:
+        output_file_name = f"from_{from_index}_until_{until_index}_channels_list.csv.gz"
 
 
     csv_file_path=output_address+output_file_name
