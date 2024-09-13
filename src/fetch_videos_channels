@@ -1,0 +1,23 @@
+import sys
+import utils.video_utils as vu
+import pandas as pd
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
+def fetch_videos_channels(from_index, to_index):
+
+    input_df = pd.read_csv(f'dataset/output_dataset/from_{from_index}_until_{to_index}_channels_list.csv.gz', compression='gzip')
+
+    vu.channels_videos_fetch_and_write_to_csv_gzipped(
+        channel_ids_df = input_df,
+        output_address= "dataset/output_dataset/",
+        output_file_name= f"videos_from_{from_index}_until_{to_index}_channels.csv.gz"
+    )
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python3 fetch_videos_channels.py <from_index> <to_index>")
+    else:
+        start_index = int(sys.argv[1])
+        to_index = int(sys.argv[2])
+        fetch_videos_channels(start_index, to_index)
