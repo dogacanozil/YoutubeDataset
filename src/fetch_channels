@@ -19,6 +19,7 @@ def fetch_channels(start_index, fetch_size_per_iteration, iteration):
 if __name__ == "__main__":
     if len(sys.argv) != 4:
         print("Usage: python fetch_channels <start_index> <fetch_size_per_iteration> <fetch_size_per_iteration>")
+        print("Example for from index 0 to 10,000 in 1 iteration")
     else:
         start_index = int(sys.argv[1])
         fetch_size_per_iteration = int(sys.argv[2])
