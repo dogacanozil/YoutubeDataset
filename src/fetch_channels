@@ -1,14 +1,10 @@
 import sys
 import utils.channel_utils as cu
-import utils.video_utils as vu
-import utils.write_utils as wu
-import utils.__deprecated_legacy_utils as lu
-import utils.video_utils_parallelization as vur
 import pandas as pd
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
-def fetch_and_save_channels(start_index, fetch_size_per_iteration, iteration):
+def fetch_channels(start_index, fetch_size_per_iteration, iteration):
 
     channel_ids = pd.read_csv('dataset/input_dataset/channel_ids.csv.gz', compression='gzip')
     sample_channel_subset_ids = channel_ids['channel_id'].to_list()
@@ -22,9 +18,9 @@ def fetch_and_save_channels(start_index, fetch_size_per_iteration, iteration):
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("Usage: python fetch_channels_and_save_folder.py <start_index> <fetch_size_per_iteration> <fetch_size_per_iteration>")
+        print("Usage: python fetch_channels <start_index> <fetch_size_per_iteration> <fetch_size_per_iteration>")
     else:
         start_index = int(sys.argv[1])
         fetch_size_per_iteration = int(sys.argv[2])
         iteration = int(sys.argv[3])
-        fetch_and_save_channels(start_index, fetch_size_per_iteration, iteration)
+        fetch_channels(start_index, fetch_size_per_iteration, iteration)
