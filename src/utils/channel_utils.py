@@ -8,32 +8,34 @@ from tqdm import tqdm
 import requests
 import urllib.request
 import urllib.error
+import logging
+import time
+
+logging.basicConfig(
+    filename='channels_fetch.log',            # Log file name
+    filemode='a',                  # Write mode ('w' for overwrite, 'a' for append)
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
+    level=logging.DEBUG            # Log level (DEBUG captures everything)
+)
+
+logging.debug("This is a debug message")
+logging.info("This is an info message")
+logging.warning("This is a warning message")
+logging.error("This is an error message")
+logging.critical("This is a critical message")
 
 
 def create_channel_record_as_list_by_channel_id(channel_id:str, counter:int = 0):
     current_time = datetime.now()
     channel_object = Channel(f"https://www.youtube.com/channel/{channel_id}")
-    
-    try:
-        channel_name = channel_object.channel_name
-    except requests.exceptions.RequestException as e:
-        if e.response.status_code == 429:
-            print("Error: Too Many Requests (HTTP 429). Please wait and try again later.")
-        elif e.response.status_code == 404:
-            print(f"HTTP error occurred: {e} and respone: {e.response}, this channel: {channel_id}")
-        raise
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return [channel_id, "", "", "", "", "", "", "" , "", current_time, False]
-    except KeyError as e:
-        return [channel_id, "", "", "", "", "", "", "" , "", current_time, False]
-    
+
+    channel_name = channel_object.channel_name
     channel_about_html = str(channel_object.about_html)
     channels_links_as_string = find_between(channel_about_html, ',"links":', ',"displayCanonicalChannelUrl":')
-    try:
-        channels_links_as_list = json.loads(channels_links_as_string)
-    except:
+    if channels_links_as_string == '':
         channels_links_as_list = {}
+    else:
+        channels_links_as_list = json.loads(channels_links_as_string)
 
     channels_links_per_channel = []
     for channel in channels_links_as_list:
@@ -50,20 +52,7 @@ def create_channel_record_as_list_by_channel_id(channel_id:str, counter:int = 0)
     else:
         channel_view_count = 0
     channel_description = find_between(channel_about_html, 'name="description" content="', '"><meta name="keywords"')
-    
-    try:
-        channel_creation_date = datetime.strptime(find_between(channel_about_html, 'joinedDateText":{"content":"Joined ', '","styleRuns"').replace(',' , ''), "%b %d %Y")
-    except ValueError as ve:
-        if channel_id == 'UCBR8-60-B28hp2BmDPdntcQ':
-            channel_creation_date = None
-        elif counter<10:
-            print(f"ValueError error occurred: {ve}, channel id: {channel_id} , channel name: {channel_name}, channel_video_count: {channel_video_count}")
-            print(f"Retry for the {counter} time")
-            return create_channel_record_as_list_by_channel_id(channel_id, counter+1)
-        else:
-            print(f"Raise error after 10 trial")
-            print(f"ValueError error occurred: {ve}, channel id: {channel_id} , channel name: {channel_name}, channel_video_count: {channel_video_count}")
-            raise
+    channel_creation_date = datetime.strptime(find_between(channel_about_html, 'joinedDateText":{"content":"Joined ', '","styleRuns"').replace(',' , ''), "%b %d %Y")
 
     channel_country = find_between(channel_about_html, '"country":"', '","')
     is_active = True
@@ -72,7 +61,58 @@ def create_channel_record_as_list_by_channel_id(channel_id:str, counter:int = 0)
 
  
 def create_channel_records_list_list(channel_ids:list):
-    return [create_channel_record_as_list_by_channel_id(channel_id) for channel_id in tqdm(channel_ids)]
+    channels_list = []
+    for channel_id in tqdm(channel_ids):
+        while True:
+            try:
+                channel_record = create_channel_record_as_list_by_channel_id(channel_id)
+                channels_list.append(channel_record)
+                break
+
+            except requests.exceptions.RequestException as e:
+                if e.response.status_code == 429:
+                    print(f"Error occurred: {e}, channel_id: {channel_id}")
+                    logging.error(f"Error occurred: {e}, channel_id: {channel_id}")
+                    logging.error(f"System will wait 1 hour to try again.")
+                    time.sleep(3600)
+                elif e.response.status_code == 404:
+                    print(f"Error occurred: {e}, channel_id: {channel_id}")
+                    logging.error(f"Error occurred: {e}, channel_id: {channel_id}")
+                    logging.error(f"System will wait 1 hour to try again.")
+                    time.sleep(3600)
+                else:
+                    print(f"Error occurred: {e}, channel_id: {channel_id}")
+                    logging.error(f"Error occurred: {e}, channel_id: {channel_id}")
+                    channels_list.append([channel_id, None, None, None, None, None, None, None , None, datetime.now(), None])
+                    break
+
+            except urllib.error.HTTPError as e:
+                print(f"Error occurred: {e}, channel_id: {channel_id}")
+                logging.error(f"Error occurred: {e}, channel_id: {channel_id}")
+                if e.code == 404:
+                    channels_list.append([channel_id, "", "", "", "", "", "", "" , "", datetime.now(), False])
+                    break
+                else:
+                    channels_list.append([channel_id, None, None, None, None, None, None, None , None, datetime.now(), None])
+                    break
+
+            except KeyError as e:
+                print(f"Error occurred: {e}, channel_id: {channel_id}")
+                logging.error(f"Error occurred: {e}, channel_id: {channel_id}")
+                if "'metadata'" == str(e):
+                    channels_list.append([channel_id, "", "", "", "", "", "", "" , "", datetime.now(), False])
+                    break
+                else:
+                    channels_list.append([channel_id, None, None, None, None, None, None, None , None, datetime.now(), None])
+                    break
+                
+            except e: 
+                print(f"Error occurred: {e}, channel_id: {channel_id}")
+                logging.error(f"Error occurred: {e}, channel_id: {channel_id}")
+                channels_list.append([channel_id, None, None, None, None, None, None, None , None, datetime.now(), None])
+                break
+
+    return channels_list
 
 
 def channels_fetch_and_write_to_csv_gzipped(channel_ids:list, output_address:str, output_file_name:str = None, write_size:int = 1000, col_names= None, from_index = None, until_index = None):

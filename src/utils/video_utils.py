@@ -5,7 +5,22 @@ import gzip
 import csv
 from datetime import datetime
 from utils.string_utils import convert_time_to_seconds, convert_views_to_int
-import json
+import time
+import requests
+import logging
+
+logging.basicConfig(
+    filename='videos_fetch.log',            # Log file name
+    filemode='a',                  # Write mode ('w' for overwrite, 'a' for append)
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
+    level=logging.DEBUG            # Log level (DEBUG captures everything)
+)
+
+logging.debug("This is a debug message")
+logging.info("This is an info message")
+logging.warning("This is a warning message")
+logging.error("This is an error message")
+logging.critical("This is a critical message")
 
 def add_channel_video_list_per_channel_id_to_list(channel_id, threshold):
     channel_video_list = []
@@ -75,27 +90,32 @@ def create_channel_video_relationship_list_limited_videos(channel_ids_df:pd.Data
     for row in tqdm(channel_ids_df.itertuples()):
         channel_index = channel_index+1
         if row.is_active is True:
-            channel_video_list.extend(add_channel_video_list_per_channel_id_to_list(row.channel_id, threshold))
-            # except json.decoder.JSONDecodeError as e:
-            #     if counter<10:
-            #         print(f"JSON Decode Error: {e}, channel_id: {row.channel_id}")
-            #         print(f"Retry for the {counter} time")
-            #         return create_channel_video_relationship_list_limited_videos(channel_ids_df, threshold, counter+1)
-            #     else:
-            #         print(f"Raise error after 10 trial")
-            #         print(f"JSON Decode Error: {e}, channel_id: {row.channel_id}")
-            #         raise
+            while True:
+                try:
+                    channel_video_list.extend(add_channel_video_list_per_channel_id_to_list(row.channel_id, threshold))
+                    break
 
-            # except TypeError as e:
-            #     if counter<10:
-            #         print(f"Type Error: {e}, channel_id: {row.channel_id}")
-            #         print(f"Retry for the {counter} time")
-            #         return create_channel_video_relationship_list_limited_videos(channel_ids_df, threshold, counter+1)
-            #     else:
-            #         print(f"Raise error after 10 trial")
-            #         print(f"Type Error: {e}, channel_id: {row.channel_id}")
-            #         raise
-
+                except requests.exceptions.RequestException as e:
+                    if e.response.status_code == 429:
+                        print(f"Error occurred: {e}, channel_id: {row.channel_id}")
+                        logging.error(f"Error occurred: {e}, channel_id: {row.channel_id}")
+                        logging.error(f"System will wait 1 hour to try again.")
+                        time.sleep(3600)
+                    elif e.response.status_code == 404:
+                        print(f"Error occurred: {e}, channel_id: {row.channel_id}")
+                        logging.error(f"Error occurred: {e}, channel_id: {row.channel_id}")
+                        logging.error(f"System will wait 1 hour to try again.")
+                        time.sleep(3600)
+                    else:
+                        print(f"Error occurred: {e}, channel_id: {row.channel_id}")
+                        logging.error(f"Error occurred: {e}, channel_id: {row.channel_id}")
+                        channel_video_list.append([row.channel_id, None, None, None, None, None, None, None, datetime.now()])
+                        break
+                except e: 
+                    print(f"Error occurred: {e}, channel_id: {row.channel_id}")
+                    logging.error(f"Error occurred: {e}, channel_id: {row.channel_id}")
+                    channel_video_list.append([row.channel_id, None, None, None, None, None, None, None, datetime.now()])
+                    break
     return channel_video_list
 
 
