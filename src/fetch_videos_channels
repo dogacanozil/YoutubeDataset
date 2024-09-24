@@ -4,13 +4,14 @@ import pandas as pd
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
-def fetch_videos_channels(from_index, to_index, batch_from_index, batch_to_index):
+# def fetch_videos_channels(from_index, to_index, batch_from_index, batch_to_index):
+def fetch_videos_channels(from_index, to_index):
 
-    input_df = pd.read_csv(f'dataset/output_dataset/from_{from_index}_until_{to_index}_channels_list.csv.gz', compression='gzip')
+    input_df = pd.read_csv(f'dataset/old_output_dataset/from_{from_index}_until_{to_index}_channels_list.csv.gz', compression='gzip')
 
-    if (batch_from_index is not None) and (batch_to_index is not None):
-        from_index = from_index+batch_from_index
-        to_index = from_index+batch_to_index
+    # if (batch_from_index is not None) and (batch_to_index is not None):
+    #     from_index = from_index+batch_from_index
+    #     to_index = from_index+batch_to_index
 
     vu.channels_videos_fetch_and_write_to_csv_gzipped(
         channel_ids_df = input_df,
@@ -31,15 +32,16 @@ if __name__ == "__main__":
     else:
         to_index = int(sys.argv[2])
 
-    if int(sys.argv[3]) is None:
-        batch_from_index = None
-    else:
-        batch_from_index = int(sys.argv[3])
+    # if int(sys.argv[3]) is None:
+    #     batch_from_index = None
+    # else:
+    #     batch_from_index = int(sys.argv[3])
 
-    if int(sys.argv[4]) is None:
-        batch_to_index = None
-    else:
-        batch_to_index = int(sys.argv[4])
+    # if int(sys.argv[4]) is None:
+    #     batch_to_index = None
+    # else:
+    #     batch_to_index = int(sys.argv[4])
 
         
-        fetch_videos_channels(from_index, to_index, batch_from_index, batch_to_index)
+        # fetch_videos_channels(from_index, to_index, batch_from_index, batch_to_index)
+        fetch_videos_channels(from_index, to_index)
