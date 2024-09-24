@@ -9,19 +9,6 @@ import time
 import requests
 import logging
 
-logging.basicConfig(
-    filename='videos_fetch.log',            # Log file name
-    filemode='a',                  # Write mode ('w' for overwrite, 'a' for append)
-    format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
-    level=logging.DEBUG            # Log level (DEBUG captures everything)
-)
-
-logging.debug("This is a debug message")
-logging.info("This is an info message")
-logging.warning("This is a warning message")
-logging.error("This is an error message")
-logging.critical("This is a critical message")
-
 def add_channel_video_list_per_channel_id_to_list(channel_id, threshold):
     channel_video_list = []
     video_count = 0
@@ -125,6 +112,20 @@ def channels_videos_fetch_and_write_to_csv_gzipped(channel_ids_df:pd.DataFrame, 
     if output_file_name is None: output_file_name = f"{size}_channels_videos_list.csv.gz"
 
     csv_file_path=output_address+output_file_name
+
+    log_file_name = output_file_name.replace(".csv.gz", ".log")
+    logging.basicConfig(
+        filename= log_file_name,            # Log file name
+        filemode='w',                  # Write mode ('w' for overwrite, 'a' for append)
+        format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
+        level=logging.DEBUG            # Log level (DEBUG captures everything)
+    )
+
+    logging.debug("This is a debug message")
+    logging.info("This is an info message")
+    logging.warning("This is a warning message")
+    logging.error("This is an error message")
+    logging.critical("This is a critical message")
 
     with gzip.open(csv_file_path, mode='wt', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
