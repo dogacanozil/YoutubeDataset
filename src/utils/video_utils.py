@@ -98,7 +98,7 @@ def create_channel_video_relationship_list_limited_videos(channel_ids_df:pd.Data
                         logging.error(f"Error occurred: {e}, channel_id: {row.channel_id}")
                         channel_video_list.append([row.channel_id, None, None, None, None, None, None, None, datetime.now()])
                         break
-                except e: 
+                except Exception as e: 
                     print(f"Error occurred: {e}, channel_id: {row.channel_id}")
                     logging.error(f"Error occurred: {e}, channel_id: {row.channel_id}")
                     channel_video_list.append([row.channel_id, None, None, None, None, None, None, None, datetime.now()])

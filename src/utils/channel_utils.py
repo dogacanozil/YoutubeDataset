@@ -93,7 +93,7 @@ def create_channel_records_list_list(channel_ids:list):
                     channels_list.append([channel_id, None, None, None, None, None, None, None , None, datetime.now(), None])
                     break
                 
-            except e: 
+            except Exception as e: 
                 print(f"Error occurred: {e}, channel_id: {channel_id}")
                 logging.error(f"Error occurred: {e}, channel_id: {channel_id}")
                 channels_list.append([channel_id, None, None, None, None, None, None, None , None, datetime.now(), None])
