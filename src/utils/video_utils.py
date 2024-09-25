@@ -83,12 +83,12 @@ def create_channel_video_relationship_list_limited_videos(channel_ids_df:pd.Data
                     break
 
                 except requests.exceptions.RequestException as e:
-                    if e.response.status_code == 429:
+                    if e.response is not None and e.response.status_code == 429:
                         print(f"Error occurred: {e}, channel_id: {row.channel_id}")
                         logging.error(f"Error occurred: {e}, channel_id: {row.channel_id}")
                         logging.error(f"System will wait 1 hour to try again.")
                         time.sleep(3600)
-                    elif e.response.status_code == 404:
+                    elif e.response is not None and e.response.status_code == 404:
                         print(f"Error occurred: {e}, channel_id: {row.channel_id}")
                         logging.error(f"Error occurred: {e}, channel_id: {row.channel_id}")
                         logging.error(f"System will wait 1 hour to try again.")
