@@ -32,16 +32,12 @@ if __name__ == "__main__":
     else:
         to_index = int(sys.argv[2])
 
-    # if int(sys.argv[3]) is None:
-    #     batch_from_index = None
-    # else:
-    #     batch_from_index = int(sys.argv[3])
+    if int(sys.argv[3]) is None:
+        print("iterations can not be None")
+        iterations = None
+    else:
+        iterations = int(sys.argv[3])
 
-    # if int(sys.argv[4]) is None:
-    #     batch_to_index = None
-    # else:
-    #     batch_to_index = int(sys.argv[4])
-
-        
-        # fetch_videos_channels(from_index, to_index, batch_from_index, batch_to_index)
-        fetch_videos_channels(from_index, to_index)
+        for i in range(iterations):
+            print(f"Now it is iteration:{i+1}, it is fetching between {from_index+(i*10000)} and {to_index+(i*10000)}")
+            fetch_videos_channels(from_index+(i*10000), to_index+(i*10000))
