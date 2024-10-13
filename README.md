@@ -1,2 +1,12 @@
-# YoutubeDataset
+# Repo Title: YoutubeDataset
 Computational Social Science - Data Engineering Application Project - TUM
+
+# Project Title: Creating a Structured Dataset for YouTube Channels to Analyze Scientific Data Related to Social Sciences
+This project is created as part of the Application Project course in the Data Engineering and Analytics M.Sc. program at the Technical University of Munich (TUM). The project, including all materials and code, was developed to further academic knowledge and is intended for educational and research purposes. It is done under the supervision of the Chair of Computational Social Science at TUM, with the application area being Computational Social Science. The project is titled "Creating a Structured Dataset for YouTube Channels to Analyze Scientific Data Related to Social Sciences," with Prof. Dr. Jürgen Pfeffer as the examiner and Anahit Sargsyan as the supervisor.
+
+# Project Description:
+YouTube provides an excellent platform to study sociocultural dynamics through user-generated content. Our goal is to leverage Data Engineering and Analytics skills to answer various research questions in the field of Computational Social Science by creating a robust and structured dataset derived from YouTube channels. We aim to efficiently process and organize large data streams using advanced data processing technologies such as Python and PySpark.
+
+The main goal of our project is to collect comprehensive data from a vast number of YouTube channels. This includes specific information such as the channels' IDs, names, descriptions, and links. Additionally, we will collect details such as the videos' publication dates, titles, descriptions, number of views, and likes. Given the large volume of data on YouTube, sampling methods may be used when necessary. Data collection will adhere to YouTube's API policies using tools such as PyTube and scrapeTube packages, supplemented with web scraping techniques when API limitations arise.
+
+This structured dataset will not only serve as a fundamental resource for academic work within the M.Sc. program but will also contribute to research in fields such as media studies, sociology, and data science. Under close supervision and adherence to rigorous data engineering standards, the project aims to offer a comprehensive toolkit for understanding and analyzing the complex social dynamics on YouTube.

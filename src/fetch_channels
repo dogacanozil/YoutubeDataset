@@ -14,7 +14,7 @@ def fetch_channels(start_index, fetch_size_per_iteration, iteration):
         from_index = start_index + (i * fetch_size_per_iteration)
         to_index = from_index+fetch_size_per_iteration
         print(f"Fetch from: {from_index} ; to: {to_index}")
-        cu.channels_fetch_and_write_to_csv_gzipped(sample_channel_subset_ids, output_address= "dataset/output_dataset/", from_index=from_index, until_index=to_index)
+        cu.channels_fetch_and_write_to_csv_gzipped(sample_channel_subset_ids, output_address= "dataset/output_channel_dataset/", from_index=from_index, until_index=to_index)
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
