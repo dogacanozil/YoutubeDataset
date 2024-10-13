@@ -105,8 +105,6 @@ def create_channel_video_relationship_list_limited_videos(channel_ids_df:pd.Data
                     break
     return channel_video_list
 
-
-
 def channels_videos_fetch_and_write_to_csv_gzipped(channel_ids_df:pd.DataFrame, output_address:str, output_file_name:str = None, write_size:int = 100, col_names:list = ['channel_id', 'video_id', 'video_title', 'video_length', 'video_description', 'video_thumbnail_url', 'video_views_count', 'video_publish_date', 'date_of_capture']):
     size = len(channel_ids_df['channel_id'])
     if output_file_name is None: output_file_name = f"{size}_channels_videos_list.csv.gz"

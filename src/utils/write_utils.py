@@ -8,14 +8,12 @@ def write_json_to_csv(list_json, output_file_name, col_names:list = ['channel_id
         for row in list_json:
             writer.writerow(row)
 
-
 def write_list_to_csv(list_json, output_file_name, col_names:list = ['channel_id', 'video_id']):
 
     with open(f"{output_file_name}.csv", mode='w', newline='') as file:
         writer = csv.writer(file, delimiter= '\u0001')
         writer.writerow(col_names)
         writer.writerows(list_json)
-
 
 def write_list_to_csv_zipped(list_json, output_file_name, col_names:list = ['channel_id', 'video_id']):
 

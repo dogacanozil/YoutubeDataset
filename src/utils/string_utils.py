@@ -7,7 +7,6 @@ def find_between( s, first, last):
     except ValueError:
         return ""
     
-
 def convert_time_to_seconds(time_string):
     # Split the time string by ':'
     time_parts = list(map(int, time_string.split(':')))
@@ -30,9 +29,6 @@ def convert_time_to_seconds(time_string):
         total_seconds = time_parts[0]
 
     return total_seconds
-
-
-
 
 def convert_views_to_int(view_string):
     # Remove non-numeric characters
